@@ -10,131 +10,455 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0a0a0b; --surface: #141416; --surface-2: #1c1c1f;
-      --border: #2a2a2e; --border-hover: #3a3a3e;
-      --text: #e8e8ec; --text-dim: #8e8e96; --text-muted: #56565e;
-      --accent: #e85d26; --accent-hover: #f06a35;
-      --accent-glow: rgba(232, 93, 38, 0.12);
-      --green: #2ea043; --green-glow: rgba(46, 160, 67, 0.10);
-      --blue: #4e8fda; --blue-glow: rgba(78, 143, 218, 0.10);
-      --yellow: #d4a72c; --yellow-glow: rgba(212, 167, 44, 0.10);
-      --red: #da4e4e;
-      --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      --mono: 'DM Mono', 'SF Mono', monospace;
+  
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #ffffff;
+      color: #111111;
+      line-height: 1.5;
     }
-    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  
+    .app {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 32px 72px;
+    }
+  
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #d9d9d9;
+    }
+  
+    .logo {
+      width: 36px;
+      height: 36px;
+      background: #111111;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+  
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111111;
+      letter-spacing: -0.02em;
+    }
+  
+    .header h1 span {
+      color: #111111;
+      font-weight: 500;
+    }
+  
+    .pipeline {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+  
+    .pip-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border: 1px solid #cfcfcf;
+      background: #ffffff;
+      color: #111111;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      min-height: 46px;
+    }
+  
+    .pip-step.active {
+      background: #111111;
+      color: #ffffff;
+      border-color: #111111;
+    }
+  
+    .pip-step.done {
+      background: #f5f5f5;
+      color: #111111;
+      border-color: #d8d8d8;
+    }
+  
+    .pip-num {
+      width: 22px;
+      height: 22px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+  
+    .pip-arrow {
+      color: #8a8a8a;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+  
+    .card {
+      background: #ffffff;
+      border: 1px solid #d9d9d9;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+  
+    .card-hd {
+      padding: 18px 22px;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  
+    .card-hd h2 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #111111;
+    }
+  
+    .card-bd {
+      padding: 22px;
+    }
+  
+    .fg {
+      margin-bottom: 18px;
+    }
+  
+    .fl {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #111111;
+      margin-bottom: 8px;
+    }
+  
+    .fi, .fta {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #cfcfcf;
+      padding: 12px 14px;
+      color: #111111;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+  
+    .fi:focus, .fta:focus {
+      border-color: #111111;
+    }
+  
+    .fta {
+      resize: vertical;
+      min-height: 170px;
+      line-height: 1.6;
+    }
+  
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #111111;
+      padding: 11px 18px;
+      background: #ffffff;
+      color: #111111;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 42px;
+    }
+  
+    .btn-accent {
+      background: #111111;
+      color: #ffffff;
+    }
+  
+    .btn-accent:hover:not(:disabled) {
+      background: #000000;
+    }
+  
+    .btn-accent:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  
+    .btn-outline {
+      background: #ffffff;
+      color: #111111;
+      border-color: #cfcfcf;
+    }
+  
+    .btn-outline:hover {
+      border-color: #111111;
+    }
+  
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 12px;
+      min-height: 34px;
+    }
+  
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+  
     @keyframes spin { to { transform: rotate(360deg); } }
-    .fade-up { animation: fadeUp 0.35s ease-out both; }
-
-    /* Layout */
-    .app { max-width: 1100px; margin: 0 auto; padding: 32px 20px 60px; }
-    .header { display:flex; align-items:center; gap:14px; margin-bottom:32px; padding-bottom:20px; border-bottom:1px solid var(--border); }
-    .logo { width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff; }
-    .header h1 { font-size:20px;font-weight:700;letter-spacing:-0.3px; }
-    .header h1 span { color:var(--text-dim);font-weight:400; }
-
-    /* Pipeline */
-    .pipeline { display:flex;gap:6px;margin-bottom:32px;overflow-x:auto;padding-bottom:6px; }
-    .pip-step { display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:7px;background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:all 0.2s; }
-    .pip-step:hover { border-color:var(--border-hover); }
-    .pip-step.active { border-color:var(--accent);background:var(--accent-glow);color:var(--accent); }
-    .pip-step.done { border-color:var(--green);background:var(--green-glow);color:var(--green); }
-    .pip-num { width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--border);color:var(--text-dim); }
-    .pip-step.active .pip-num { background:var(--accent);color:#fff; }
-    .pip-step.done .pip-num { background:var(--green);color:#fff; }
-    .pip-arrow { color:var(--text-muted);font-size:12px; }
-
-    /* Card */
-    .card { background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden; }
-    .card-hd { padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
-    .card-hd h2 { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim); }
-    .card-bd { padding:18px; }
-
-    /* Form */
-    .fg { margin-bottom:14px; }
-    .fl { display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px; }
-    .fi, .fta { width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color 0.2s; }
-    .fi:focus, .fta:focus { border-color:var(--accent); }
-    .fta { resize:vertical;min-height:140px;font-family:var(--mono);font-size:11.5px;line-height:1.7; }
-    .row2 { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
-
-    /* Buttons */
-    .btn { display:inline-flex;align-items:center;gap:7px;border:none;padding:10px 20px;border-radius:7px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s; }
-    .btn-accent { background:var(--accent);color:#fff;box-shadow:0 0 16px var(--accent-glow); }
-    .btn-accent:hover:not(:disabled) { background:var(--accent-hover);transform:translateY(-1px); }
-    .btn-accent:disabled { opacity:0.45;cursor:not-allowed; }
-    .btn-outline { background:none;border:1px solid var(--border);color:var(--text-dim); }
-    .btn-outline:hover { border-color:var(--text-dim);color:var(--text); }
-    .btn-sm { padding:6px 12px;font-size:11px; }
-    .spinner { width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite; }
-
-    /* Stats */
-    .stats { display:flex;gap:20px;padding:12px 18px;background:var(--surface-2);border-radius:7px;margin-bottom:16px; }
-    .stat-v { font-size:20px;font-weight:800;color:var(--accent); }
-    .stat-l { font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px; }
-
-    /* Table */
-    .tbl { width:100%;border-collapse:collapse;font-size:12px; }
-    .tbl th { text-align:left;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;padding:7px 10px;border-bottom:1px solid var(--border); }
-    .tbl td { padding:6px 10px;border-bottom:1px solid rgba(42,42,42,0.4); }
-    .tbl tr:hover td { background:var(--surface-2); }
-
-    /* Tags */
-    .tag { display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding:2px 7px;border-radius:3px; }
-    .tag-orange { color:var(--accent);background:var(--accent-glow); }
-    .tag-green { color:var(--green);background:var(--green-glow); }
-    .tag-blue { color:var(--blue);background:var(--blue-glow); }
-
-    /* Dish grid */
-    .dishes { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px; }
-    .dish { background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:14px;transition:border-color 0.2s; }
-    .dish:hover { border-color:var(--border-hover); }
-    .dish-top { display:flex;justify-content:space-between;margin-bottom:6px; }
-    .dish-name { font-size:14px;font-weight:700; }
-    .dish-price { font-family:var(--mono);font-size:13px;color:var(--green); }
-    .dish-desc { font-size:12px;color:var(--text-dim);margin-bottom:10px; }
-    .dish-prep { font-size:11px;color:var(--text-muted);font-style:italic;margin-bottom:10px;padding-left:9px;border-left:2px solid var(--border); }
-
-    /* Email preview */
-    .email-card { background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px; }
-    .email-to { font-family:var(--mono);font-size:11px;color:var(--blue); }
-    .email-subj { font-size:13px;font-weight:600;margin:4px 0; }
-    .email-meta { font-size:11px;color:var(--text-muted); }
-    .email-status { font-family:var(--mono);font-size:11px; }
-    .email-status.sent { color:var(--green); }
-    .email-status.mock { color:var(--yellow); }
-    .email-status.failed { color:var(--red); }
-
-    /* Distributor card */
-    .dist-card { background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px; }
-    .dist-name { font-size:13px;font-weight:700; }
-    .dist-meta { font-size:11px;color:var(--text-dim);margin-top:2px; }
-    .dist-score { font-family:var(--mono);font-size:12px;color:var(--green); }
-
-    /* Error */
-    .err { background:rgba(218,78,78,0.08);border:1px solid rgba(218,78,78,0.25);border-radius:7px;padding:12px 16px;color:#f87171;font-size:12px;margin-top:12px; }
-
-    /* Hint */
-    .hint { font-size:11px;color:var(--text-muted);margin-top:5px; }
-    .hint a { color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px; }
-
-    /* Email HTML preview */
-    .email-preview { background:#fff;border-radius:6px;padding:4px;margin-top:10px;max-height:400px;overflow-y:auto; }
-    .email-preview iframe { width:100%;height:350px;border:none;border-radius:4px; }
-
-    /* Toggle */
-    .toggle { font-family:var(--mono);font-size:10px;color:var(--text-muted);cursor:pointer;text-decoration:underline; }
+  
+    .stats {
+      display: flex;
+      gap: 28px;
+      padding: 18px 22px;
+      background: #fafafa;
+      border: 1px solid #e3e3e3;
+      margin-bottom: 20px;
+    }
+  
+    .stat-v {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111111;
+    }
+  
+    .stat-l {
+      font-size: 11px;
+      color: #666666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+  
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+  
+    .tbl th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #666666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 12px;
+      border-bottom: 1px solid #dcdcdc;
+    }
+  
+    .tbl td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eeeeee;
+      vertical-align: top;
+    }
+  
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 4px 8px;
+      border: 1px solid #cfcfcf;
+      background: #ffffff;
+      color: #111111;
+    }
+  
+    .tag-orange, .tag-green, .tag-blue {
+      color: #111111;
+      background: #ffffff;
+      border-color: #cfcfcf;
+    }
+  
+    .dishes {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+      gap: 18px;
+    }
+  
+    .dish {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      padding: 18px;
+    }
+  
+    .dish-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+  
+    .dish-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111111;
+    }
+  
+    .dish-price {
+      font-size: 13px;
+      color: #111111;
+    }
+  
+    .dish-desc {
+      font-size: 13px;
+      color: #444444;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+  
+    .dish-prep {
+      font-size: 12px;
+      color: #444444;
+      font-style: italic;
+      margin-bottom: 10px;
+      padding-left: 10px;
+      border-left: 2px solid #d0d0d0;
+    }
+  
+    .email-card {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+  
+    .email-to {
+      font-size: 12px;
+      color: #444444;
+      word-break: break-word;
+    }
+  
+    .email-subj {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 6px 0;
+      color: #111111;
+    }
+  
+    .email-meta {
+      font-size: 12px;
+      color: #555555;
+    }
+  
+    .email-status {
+      font-size: 12px;
+      color: #111111;
+    }
+  
+    .email-status.sent,
+    .email-status.mock,
+    .email-status.failed {
+      color: #111111;
+    }
+  
+    .dist-card {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+  
+    .dist-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111111;
+    }
+  
+    .dist-meta {
+      font-size: 12px;
+      color: #555555;
+      margin-top: 4px;
+    }
+  
+    .dist-score {
+      font-size: 12px;
+      color: #111111;
+    }
+  
+    .err {
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      padding: 12px 14px;
+      color: #111111;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+  
+    .hint {
+      font-size: 12px;
+      color: #555555;
+      margin-top: 8px;
+    }
+  
+    .hint a {
+      color: #111111;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  
+    .email-preview {
+      background: #ffffff;
+      padding: 6px;
+      margin-top: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid #dddddd;
+    }
+  
+    .email-preview iframe {
+      width: 100%;
+      height: 360px;
+      border: none;
+      background: #ffffff;
+    }
+  
+    .toggle {
+      font-size: 11px;
+      color: #111111;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  
+    .fade-up {
+      animation: none;
+    }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useCallback, useEffect } = React;
+const { useState } = React;
 const API = "http://127.0.0.1:8000";
 
 const SAMPLE_MENU = `SALADS
@@ -153,7 +477,10 @@ Eggplant Gratinadas - eggplant baked with cheese, fresh Roma tomatoes & goat che
 // ── API helpers ──
 async function api(path, opts = {}) {
   const res = await fetch(API + path, { headers: { "Content-Type": "application/json" }, ...opts });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || `HTTP ${res.status}`); }
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.detail || `HTTP ${res.status}`);
+  }
   return res.json();
 }
 const post = (path, body) => api(path, { method: "POST", body: body ? JSON.stringify(body) : undefined });
@@ -162,21 +489,22 @@ const get = (path) => api(path);
 // ── Pipeline Steps Bar ──
 function Pipeline({ step, setStep, done }) {
   const steps = [
-    { n:1, l:"Menu \u2192 Recipes" },
-    { n:2, l:"USDA Pricing" },
-    { n:3, l:"Find Distributors" },
-    { n:4, l:"Send RFP Emails" },
+    { n: 1, l: "Menu Recipes" },
+    { n: 2, l: "USDA Pricing" },
+    { n: 3, l: "Find Distributors" },
+    { n: 4, l: "Send RFP Emails" },
   ];
+
   return (
     <div className="pipeline">
       {steps.map((s, i) => (
         <React.Fragment key={s.n}>
-          {i > 0 && <span className="pip-arrow">\u2192</span>}
+          {i > 0 && <span className="pip-arrow">→</span>}
           <div
-            className={`pip-step ${s.n === step ? 'active' : done.has(s.n) ? 'done' : ''}`}
+            className={`pip-step ${s.n === step ? "active" : done.has(s.n) ? "done" : ""}`}
             onClick={() => (done.has(s.n) || s.n === step) && setStep(s.n)}
           >
-            <div className="pip-num">{done.has(s.n) ? "\u2713" : s.n}</div>
+            <div className="pip-num">{done.has(s.n) ? "✓" : s.n}</div>
             {s.l}
           </div>
         </React.Fragment>
@@ -196,60 +524,79 @@ function Step1({ menuId, setMenuId, menuData, setMenuData, markDone }) {
   const [mode, setMode] = useState("text");
 
   const parseText = async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const data = await post("/step1/parse-menu", { restaurant_name: name, menu_text: text, menu_url: url || undefined });
-      setMenuData(data); setMenuId(data.id); markDone(1);
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+      const data = await post("/step1/parse-menu", {
+        restaurant_name: name,
+        menu_text: text,
+        menu_url: url || undefined
+      });
+      setMenuData(data);
+      setMenuId(data.id);
+      markDone(1);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const parseImage = async () => {
     if (!img) return;
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const fd = new FormData();
       fd.append("image", img);
       if (name) fd.append("restaurant_name", name);
       const res = await fetch(API + "/step1/parse-menu-image", { method: "POST", body: fd });
-      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || `HTTP ${res.status}`); }
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.detail || `HTTP ${res.status}`);
+      }
       const data = await res.json();
-      setMenuData(data); setMenuId(data.id); markDone(1);
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+      setMenuData(data);
+      setMenuId(data.id);
+      markDone(1);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fade-up">
       <div className="card">
         <div className="card-hd">
-          <h2>Step 1 \u2014 Menu Input</h2>
-          <div style={{display:'flex',gap:6}}>
-            <button className={`btn btn-sm ${mode==='text'?'btn-accent':'btn-outline'}`} onClick={()=>setMode('text')}>Text</button>
-            <button className={`btn btn-sm ${mode==='image'?'btn-accent':'btn-outline'}`} onClick={()=>setMode('image')}>Image</button>
+          <h2>Step 1 — Menu Input</h2>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button className={`btn btn-sm ${mode === "text" ? "btn-accent" : "btn-outline"}`} onClick={() => setMode("text")}>Text</button>
+            <button className={`btn btn-sm ${mode === "image" ? "btn-accent" : "btn-outline"}`} onClick={() => setMode("image")}>Image</button>
           </div>
         </div>
         <div className="card-bd">
           <div className="fg">
             <label className="fl">Restaurant Name</label>
-            <input className="fi" value={name} onChange={e=>setName(e.target.value)} placeholder="e.g., Joe's Italian Kitchen" />
+            <input className="fi" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Joe's Italian Kitchen" />
           </div>
 
-          {mode === 'text' ? (
+          {mode === "text" ? (
             <div className="fg">
               <label className="fl">Menu Text</label>
-              <textarea className="fta" value={text} onChange={e=>setText(e.target.value)} placeholder="Paste the full menu here..." />
-              <div className="hint">No menu? <a onClick={()=>{setText(SAMPLE_MENU);setName("Coastal Bistro")}}>Load sample menu</a></div>
+              <textarea className="fta" value={text} onChange={e => setText(e.target.value)} placeholder="Paste the full menu here..." />
+              <div className="hint">No menu? <a onClick={() => { setText(SAMPLE_MENU); setName("Coastal Bistro"); }}>Load sample menu</a></div>
             </div>
           ) : (
             <div className="fg">
               <label className="fl">Upload Menu Image</label>
-              <input type="file" accept="image/*" onChange={e=>setImg(e.target.files[0])} style={{fontSize:13,color:'var(--text-dim)'}} />
+              <input type="file" accept="image/*" onChange={e => setImg(e.target.files[0])} style={{ fontSize: 13, color: "#555" }} />
             </div>
           )}
 
-          <button className="btn btn-accent" disabled={loading || (mode==='text' ? !text.trim() : !img)} onClick={mode==='text' ? parseText : parseImage}>
-            {loading ? <><div className="spinner"></div> Parsing with Gemini...</> : <>Parse Menu \u2192 Recipes</>}
+          <button className="btn btn-accent" disabled={loading || (mode === "text" ? !text.trim() : !img)} onClick={mode === "text" ? parseText : parseImage}>
+            {loading ? <><div className="spinner"></div> Parsing with Gemini...</> : <>Parse Menu → Recipes</>}
           </button>
           {error && <div className="err">{error}</div>}
         </div>
@@ -259,8 +606,8 @@ function Step1({ menuId, setMenuId, menuData, setMenuData, markDone }) {
         <>
           <div className="stats fade-up">
             <div><div className="stat-v">{menuData.recipes?.length || 0}</div><div className="stat-l">Dishes</div></div>
-            <div><div className="stat-v">{[...new Set(menuData.recipes?.flatMap(r=>r.ingredients?.map(i=>i.ingredient_name))||[])].length}</div><div className="stat-l">Unique Ingredients</div></div>
-            <div><div className="stat-v" style={{color:'var(--blue)'}}>{menuData.id}</div><div className="stat-l">Menu ID</div></div>
+            <div><div className="stat-v">{[...new Set(menuData.recipes?.flatMap(r => r.ingredients?.map(i => i.ingredient_name)) || [])].length}</div><div className="stat-l">Unique Ingredients</div></div>
+            <div><div className="stat-v">{menuData.id}</div><div className="stat-l">Menu ID</div></div>
           </div>
           <div className="card fade-up">
             <div className="card-hd"><h2>Parsed Dishes & Ingredients</h2></div>
@@ -284,19 +631,19 @@ function DishCard({ dish }) {
         <div className="dish-name">{dish.dish_name}</div>
       </div>
       {dish.description && <div className="dish-desc">{dish.description}</div>}
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span className="tag tag-orange">{dish.ingredients?.length || 0} ingredients</span>
-        <span className="toggle" onClick={()=>setOpen(!open)}>{open?'hide':'show'}</span>
+        <span className="toggle" onClick={() => setOpen(!open)}>{open ? "hide" : "show"}</span>
       </div>
       {open && dish.ingredients && (
         <table className="tbl">
           <thead><tr><th>Ingredient</th><th>Qty</th><th>Notes</th></tr></thead>
           <tbody>
-            {dish.ingredients.map((ing,i) => (
+            {dish.ingredients.map((ing, i) => (
               <tr key={i}>
-                <td style={{fontWeight:500}}>{ing.ingredient_name}</td>
-                <td style={{fontFamily:'var(--mono)'}}>{ing.quantity ? `${ing.quantity} ${ing.unit||''}` : '\u2014'}</td>
-                <td style={{color:'var(--text-muted)',fontStyle:'italic',fontSize:11}}>{ing.preparation_notes||''}</td>
+                <td style={{ fontWeight: 500 }}>{ing.ingredient_name}</td>
+                <td>{ing.quantity ? `${ing.quantity} ${ing.unit || ""}` : "—"}</td>
+                <td style={{ color: "#666", fontStyle: "italic", fontSize: 11 }}>{ing.preparation_notes || ""}</td>
               </tr>
             ))}
           </tbody>
@@ -313,20 +660,25 @@ function Step2({ menuId, markDone }) {
   const [error, setError] = useState(null);
 
   const fetchPricing = async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const d = await post(`/step2/fetch-pricing/${menuId}`);
-      setData(d); markDone(2);
-    } catch(e) { setError(e.message); }
-    finally { setLoading(false); }
+      setData(d);
+      markDone(2);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fade-up">
       <div className="card">
-        <div className="card-hd"><h2>Step 2 \u2014 USDA Ingredient Pricing</h2></div>
+        <div className="card-hd"><h2>Step 2 — USDA Ingredient Pricing</h2></div>
         <div className="card-bd">
-          <p style={{fontSize:13,color:'var(--text-dim)',marginBottom:14}}>Fetch pricing data from the USDA MARS API for all ingredients in menu #{menuId}.</p>
+          <p style={{ fontSize: 13, color: "#666", marginBottom: 14 }}>Fetch pricing data from the USDA MARS API for all ingredients in menu #{menuId}.</p>
           <button className="btn btn-accent" onClick={fetchPricing} disabled={loading}>
             {loading ? <><div className="spinner"></div> Fetching pricing...</> : <>Fetch Pricing Data</>}
           </button>
@@ -346,12 +698,12 @@ function Step2({ menuId, markDone }) {
               <table className="tbl">
                 <thead><tr><th>Ingredient</th><th>USDA Commodity</th><th>Snapshots</th><th>Status</th></tr></thead>
                 <tbody>
-                  {data.results?.map((r,i) => (
+                  {data.results?.map((r, i) => (
                     <tr key={i}>
-                      <td style={{fontWeight:500}}>{r.ingredient_name}</td>
-                      <td style={{fontFamily:'var(--mono)',fontSize:11}}>{r.commodity_name}</td>
-                      <td style={{fontFamily:'var(--mono)'}}>{r.snapshots_found}</td>
-                      <td>{r.snapshots_found > 0 ? <span className="tag tag-green">found</span> : <span className="tag" style={{color:'var(--text-muted)',background:'var(--surface)'}}>no data</span>}</td>
+                      <td style={{ fontWeight: 500 }}>{r.ingredient_name}</td>
+                      <td style={{ fontSize: 11 }}>{r.commodity_name}</td>
+                      <td>{r.snapshots_found}</td>
+                      <td>{r.snapshots_found > 0 ? <span className="tag tag-green">found</span> : <span className="tag">no data</span>}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -371,20 +723,25 @@ function Step3({ menuId, markDone }) {
   const [error, setError] = useState(null);
 
   const findDist = async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const d = await post(`/step3/find-distributors/${menuId}`);
-      setData(d); markDone(3);
-    } catch(e) { setError(e.message); }
-    finally { setLoading(false); }
+      setData(d);
+      markDone(3);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fade-up">
       <div className="card">
-        <div className="card-hd"><h2>Step 3 \u2014 Find Local Distributors</h2></div>
+        <div className="card-hd"><h2>Step 3 — Find Local Distributors</h2></div>
         <div className="card-bd">
-          <p style={{fontSize:13,color:'var(--text-dim)',marginBottom:14}}>Search for food distributors near the restaurant and match them to ingredients.</p>
+          <p style={{ fontSize: 13, color: "#666", marginBottom: 14 }}>Search for food distributors near the restaurant and match them to ingredients.</p>
           <button className="btn btn-accent" onClick={findDist} disabled={loading}>
             {loading ? <><div className="spinner"></div> Searching OSM + matching...</> : <>Find Distributors</>}
           </button>
@@ -397,20 +754,20 @@ function Step3({ menuId, markDone }) {
           <div className="stats fade-up">
             <div><div className="stat-v">{data.distributor_count}</div><div className="stat-l">Distributors Found</div></div>
             <div><div className="stat-v">{data.match_count}</div><div className="stat-l">Matches</div></div>
-            <div><div className="stat-v" style={{color:'var(--blue)'}}>{data.city}, {data.state}</div><div className="stat-l">Location</div></div>
+            <div><div className="stat-v">{data.city}, {data.state}</div><div className="stat-l">Location</div></div>
           </div>
           <div className="card fade-up">
-            <div className="card-hd"><h2>Ingredient \u2194 Distributor Matches</h2></div>
+            <div className="card-hd"><h2>Ingredient ↔ Distributor Matches</h2></div>
             <div className="card-bd">
               <table className="tbl">
                 <thead><tr><th>Ingredient</th><th>Distributor</th><th>Category</th><th>Confidence</th></tr></thead>
                 <tbody>
-                  {data.matches?.map((m,i) => (
+                  {data.matches?.map((m, i) => (
                     <tr key={i}>
-                      <td style={{fontWeight:500}}>{m.ingredient_name}</td>
+                      <td style={{ fontWeight: 500 }}>{m.ingredient_name}</td>
                       <td>{m.distributor_name}</td>
-                      <td><span className="tag tag-blue">{m.matched_category || '\u2014'}</span></td>
-                      <td style={{fontFamily:'var(--mono)'}}>{m.confidence_score ? `${(m.confidence_score * 100).toFixed(0)}%` : '\u2014'}</td>
+                      <td><span className="tag tag-blue">{m.matched_category || "—"}</span></td>
+                      <td>{m.confidence_score ? `${(m.confidence_score * 100).toFixed(0)}%` : "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -429,33 +786,40 @@ function Step4({ menuId, markDone }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [loadingPreview, setLoadingPreview] = useState(false);
 
   const sendEmails = async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const d = await post(`/step4/send-rfp-emails/${menuId}`);
-      setData(d); markDone(4);
-    } catch(e) { setError(e.message); }
-    finally { setLoading(false); }
+      setData(d);
+      markDone(4);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadPreview = async (emailId) => {
-    if (preview?.id === emailId) { setPreview(null); return; }
-    setLoadingPreview(true);
+    if (preview?.id === emailId) {
+      setPreview(null);
+      return;
+    }
     try {
       const d = await get(`/step4/rfp-email-detail/${emailId}`);
       setPreview(d);
-    } catch(e) { console.error(e); }
-    finally { setLoadingPreview(false); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
     <div className="fade-up">
       <div className="card">
-        <div className="card-hd"><h2>Step 4 \u2014 Send RFP Emails</h2></div>
+        <div className="card-hd"><h2>Step 4 — Send RFP Emails</h2></div>
         <div className="card-bd">
-          <p style={{fontSize:13,color:'var(--text-dim)',marginBottom:14}}>Compose and send RFP emails requesting price quotes from distributors.</p>
+          <p style={{ fontSize: 13, color: "#666", marginBottom: 14 }}>Compose and send RFP emails requesting price quotes from distributors.</p>
           <button className="btn btn-accent" onClick={sendEmails} disabled={loading}>
             {loading ? <><div className="spinner"></div> Sending emails...</> : <>Send RFP Emails</>}
           </button>
@@ -467,31 +831,31 @@ function Step4({ menuId, markDone }) {
         <>
           <div className="stats fade-up">
             <div><div className="stat-v">{data.emails_sent}</div><div className="stat-l">Emails Sent</div></div>
-            <div><div className="stat-v" style={{color: data.mock_mode ? 'var(--yellow)' : 'var(--green)'}}>{data.mock_mode ? 'Mock' : 'Live'}</div><div className="stat-l">Mode</div></div>
-            <div><div className="stat-v" style={{color:'var(--blue)',fontSize:16}}>{data.quote_deadline}</div><div className="stat-l">Deadline</div></div>
+            <div><div className="stat-v">{data.mock_mode ? "Mock" : "Live"}</div><div className="stat-l">Mode</div></div>
+            <div><div className="stat-v" style={{ fontSize: 16 }}>{data.quote_deadline}</div><div className="stat-l">Deadline</div></div>
           </div>
           <div className="card fade-up">
             <div className="card-hd"><h2>Sent Emails</h2></div>
             <div className="card-bd">
               {data.results?.map((r, i) => (
                 <div className="email-card" key={i}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{fontWeight:700,fontSize:14}}>{r.distributor_name}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>{r.distributor_name}</div>
                       <div className="email-to">{r.to_email}</div>
                       <div className="email-subj">{r.subject}</div>
-                      <div className="email-meta">{r.ingredient_count} ingredients \u00b7 Deadline: {r.deadline}</div>
+                      <div className="email-meta">{r.ingredient_count} ingredients · Deadline: {r.deadline}</div>
                     </div>
-                    <div style={{textAlign:'right'}}>
-                      <div className={`email-status ${r.status === 'sent' ? 'sent' : r.status === 'sent_mock' ? 'mock' : 'failed'}`}>
-                        {r.status === 'sent' ? '\u2713 Sent' : r.status === 'sent_mock' ? '\u26a0 Mock' : '\u2717 Failed'}
+                    <div style={{ textAlign: "right" }}>
+                      <div className={`email-status ${r.status === "sent" ? "sent" : r.status === "sent_mock" ? "mock" : "failed"}`}>
+                        {r.status === "sent" ? "✓ Sent" : r.status === "sent_mock" ? "⚠ Mock" : "✗ Failed"}
                       </div>
-                      <span className="toggle" style={{marginTop:4,display:'inline-block'}} onClick={()=>loadPreview(i+1)}>
-                        {preview?.id === i+1 ? 'hide preview' : 'preview email'}
+                      <span className="toggle" style={{ marginTop: 4, display: "inline-block" }} onClick={() => loadPreview(r.id)}>
+                        {preview?.id === r.id ? "hide preview" : "preview email"}
                       </span>
                     </div>
                   </div>
-                  {preview && preview.distributor_name === r.distributor_name && (
+                  {preview && preview.id === r.id && (
                     <div className="email-preview fade-up">
                       <iframe srcDoc={preview.body_html} title="Email Preview" />
                     </div>
@@ -514,7 +878,11 @@ function App() {
   const [menuData, setMenuData] = useState(null);
 
   const markDone = (n) => {
-    setDone(prev => { const s = new Set(prev); s.add(n); return s; });
+    setDone(prev => {
+      const s = new Set(prev);
+      s.add(n);
+      return s;
+    });
     if (n < 4) setStep(n + 1);
   };
 
@@ -533,7 +901,11 @@ function App() {
       {step === 4 && menuId && <Step4 menuId={menuId} markDone={markDone} />}
 
       {step > 1 && !menuId && (
-        <div className="card fade-up"><div className="card-bd"><p style={{color:'var(--text-dim)',fontSize:13}}>Please complete Step 1 first to parse a menu.</p></div></div>
+        <div className="card fade-up">
+          <div className="card-bd">
+            <p style={{ color: "#666", fontSize: 13 }}>Please complete Step 1 first to parse a menu.</p>
+          </div>
+        </div>
       )}
     </div>
   );
