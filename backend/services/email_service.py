@@ -1,9 +1,3 @@
-"""
-Step 4 — Send RFP Emails to Distributors
-Composes and sends RFP emails requesting price quotes for ingredients.
-Supports real SMTP (Gmail) and a mock mode for demos.
-"""
-
 import os
 import smtplib
 from datetime import datetime, timedelta, timezone
@@ -23,23 +17,18 @@ from app.models import (
     RFPEmail,
 )
 
-# ── Config ──────────────────────────────────────────────────────
-
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER = os.getenv("SMTP_USER", "")  # your Gmail address
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")  # Gmail app password
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "") 
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "") or SMTP_USER
 SENDER_NAME = os.getenv("SENDER_NAME", "Pathway RFP System")
 
-# If True, emails are logged to DB but not actually sent (for demo without SMTP)
 MOCK_MODE = os.getenv("EMAIL_MOCK_MODE", "true").lower() in ("true", "1", "yes")
 
-# Quote deadline: days from now
 QUOTE_DEADLINE_DAYS = int(os.getenv("QUOTE_DEADLINE_DAYS", "7"))
 
 
-# ── Email Composition ──────────────────────────────────────────
 
 def compose_rfp_email(
     restaurant_name: str,
@@ -48,15 +37,9 @@ def compose_rfp_email(
     deadline: str,
     sender_name: str = SENDER_NAME,
 ) -> dict:
-    """
-    Compose an RFP email body for a distributor.
-
-    ingredients format: [{"name": "tomato", "quantity": 5.0, "unit": "lbs", "dishes": ["Bruschetta"]}]
-    Returns: {"subject": str, "body_text": str, "body_html": str}
-    """
+   
     subject = f"Request for Quote — {restaurant_name} Ingredient Sourcing"
 
-    # Build ingredient table rows
     ing_rows_text = ""
     ing_rows_html = ""
     for i, ing in enumerate(ingredients, 1):
@@ -144,16 +127,12 @@ Best regards,
         "body_html": body_html.strip(),
     }
 
-
-# ── Email Sending ──────────────────────────────────────────────
-
 def send_email_smtp(
     to_email: str,
     subject: str,
     body_text: str,
     body_html: str,
 ) -> dict:
-    """Send an email via SMTP. Returns status dict."""
     if MOCK_MODE or not SMTP_USER or not SMTP_PASSWORD:
         return {
             "sent": True,
@@ -180,25 +159,14 @@ def send_email_smtp(
     except Exception as e:
         return {"sent": False, "mock": False, "message": f"SMTP error: {str(e)}"}
 
-
-# ── Main Orchestrator ──────────────────────────────────────────
-
 def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
-    """
-    Full Step 4 pipeline:
-    1. Load menu + ingredient-distributor matches from DB
-    2. Group ingredients by distributor
-    3. Compose & send one RFP email per distributor
-    4. Persist email records to DB
-    """
-    # 1. Load menu source
+    
     menu_source = db.query(MenuSource).filter(MenuSource.id == menu_source_id).first()
     if not menu_source:
         raise ValueError(f"Menu source {menu_source_id} not found")
 
     restaurant_name = menu_source.restaurant_name or "Our Restaurant"
 
-    # 2. Load all matches for this menu
     matches = (
         db.query(IngredientDistributorMatch)
         .options(
@@ -212,7 +180,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
     if not matches:
         raise ValueError(f"No distributor matches found for menu source {menu_source_id}. Run Step 3 first.")
 
-    # 3. Load all recipe ingredients for quantity/unit lookup and dish names
     recipes = (
         db.query(Recipe)
         .options(
@@ -222,7 +189,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
         .all()
     )
 
-    # Build ingredient → {quantity, unit, dishes} map
     ingredient_details = {}
     for recipe in recipes:
         for ri in recipe.ingredients:
@@ -236,8 +202,7 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
                 }
             ingredient_details[ing_id]["dishes"].append(recipe.dish_name)
 
-    # 4. Group ingredients by distributor
-    distributor_ingredients = {}  # distributor_id → {"distributor": Distributor, "ingredients": [...]}
+    distributor_ingredients = {}
     for match in matches:
         d_id = match.distributor_id
         if d_id not in distributor_ingredients:
@@ -260,7 +225,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
             "dishes": ing_info.get("dishes", []),
         })
 
-    # 5. Compose and send emails
     deadline = (datetime.now(timezone.utc) + timedelta(days=QUOTE_DEADLINE_DAYS)).strftime("%B %d, %Y")
 
     email_results = []
@@ -269,10 +233,8 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
         distributor = data["distributor"]
         ingredients = data["ingredients"]
 
-        # Use distributor email or generate a mock one
         to_email = distributor.email or f"{distributor.name.lower().replace(' ', '.')}@mock-distributor.example.com"
 
-        # Compose
         email_content = compose_rfp_email(
             restaurant_name=restaurant_name,
             distributor_name=distributor.name,
@@ -280,7 +242,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
             deadline=deadline,
         )
 
-        # Send (or mock)
         send_result = send_email_smtp(
             to_email=to_email,
             subject=email_content["subject"],
@@ -288,7 +249,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
             body_html=email_content["body_html"],
         )
 
-        # 6. Persist to DB
         rfp_email = RFPEmail(
             menu_source_id=menu_source_id,
             distributor_id=d_id,
@@ -328,7 +288,6 @@ def send_rfp_emails_for_menu(db: Session, menu_source_id: int) -> dict:
 
 
 def list_rfp_emails_for_menu(db: Session, menu_source_id: int) -> list:
-    """Return all RFP emails sent for a given menu source."""
     return (
         db.query(RFPEmail)
         .options(joinedload(RFPEmail.distributor))
@@ -339,7 +298,6 @@ def list_rfp_emails_for_menu(db: Session, menu_source_id: int) -> list:
 
 
 def get_rfp_email_detail(db: Session, email_id: int) -> Optional[RFPEmail]:
-    """Get a single RFP email with full body content."""
     return (
         db.query(RFPEmail)
         .options(joinedload(RFPEmail.distributor))
