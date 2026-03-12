@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -187,3 +187,50 @@ class SendRFPResponse(BaseModel):
     mock_mode: bool
     quote_deadline: str
     results: list
+
+
+# -------------------------
+# Step 5 - Quotes
+# -------------------------
+
+class SubmitQuoteRequest(BaseModel):
+    distributor_id: int
+    email_text: str
+
+
+class QuoteItemOut(BaseModel):
+    id: int
+    ingredient_name: str
+    ingredient_id: Optional[int] = None
+    unit_price: Optional[float] = None
+    unit: Optional[str] = None
+    minimum_order_quantity: Optional[float] = None
+    minimum_order_unit: Optional[str] = None
+    notes: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class QuoteOut(BaseModel):
+    id: int
+    distributor_id: int
+    distributor_name: str
+    items_count: int
+    delivery_lead_days: Optional[int] = None
+    payment_terms: Optional[str] = None
+    delivery_notes: Optional[str] = None
+    status: str
+    items: List[QuoteItemOut]
+
+    class Config:
+        from_attributes = True
+
+
+class QuoteComparisonResponse(BaseModel):
+    menu_source_id: int
+    quotes_received: int
+    ingredients_compared: int
+    distributor_summaries: Dict[str, Any]
+    comparison_table: List[Dict[str, Any]]
+    recommendation: Dict[str, Any]

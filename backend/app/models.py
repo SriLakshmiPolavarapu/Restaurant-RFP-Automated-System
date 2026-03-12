@@ -136,3 +136,40 @@ class RFPEmail(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     distributor = relationship("Distributor")
+
+
+# ── Step 5 Models ──────────────────────────────────────────────
+
+class DistributorQuote(Base):
+    __tablename__ = "distributor_quotes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    menu_source_id = Column(Integer, ForeignKey("menu_sources.id"), nullable=False)
+    distributor_id = Column(Integer, ForeignKey("distributors.id"), nullable=False)
+    raw_email_text = Column(Text, nullable=True)
+    delivery_lead_days = Column(Integer, nullable=True)
+    delivery_notes = Column(Text, nullable=True)
+    payment_terms = Column(String(255), nullable=True)
+    valid_until = Column(String(100), nullable=True)
+    general_notes = Column(Text, nullable=True)
+    status = Column(String(50), nullable=False, default="received")  # received, complete, incomplete
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    distributor = relationship("Distributor")
+    items = relationship("DistributorQuoteItem", back_populates="quote", cascade="all, delete-orphan")
+
+
+class DistributorQuoteItem(Base):
+    __tablename__ = "distributor_quote_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    quote_id = Column(Integer, ForeignKey("distributor_quotes.id"), nullable=False)
+    ingredient_id = Column(Integer, ForeignKey("ingredients.id"), nullable=True)
+    ingredient_name = Column(String(255), nullable=False)
+    unit_price = Column(Float, nullable=True)
+    unit = Column(String(50), nullable=True)
+    minimum_order_quantity = Column(Float, nullable=True)
+    minimum_order_unit = Column(String(50), nullable=True)
+    notes = Column(Text, nullable=True)
+
+    quote = relationship("DistributorQuote", back_populates="items")
