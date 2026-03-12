@@ -1,9 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
     GEMINI_API_KEY: str
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    USDA_API_KEY: str
     DATABASE_URL: str = "sqlite:///./pathway_rfp.db"
 
     model_config = SettingsConfigDict(
