@@ -12,10 +12,11 @@ from services.menu_parser import (
     parse_menu_with_gemini,
     save_parsed_menu,
 )
+from services.nutrition_service import get_ingredient_nutrition
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Pathway RFP Pipeline - Step 1")
+app = FastAPI(title="Pathway RFP Pipeline")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,9 +27,19 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def root():
+    return {
+        "message": "Pathway RFP backend is running",
+        "step": "1 and 2",
+        "health": "/health",
+        "docs": "/docs",
+    }
+
+
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "step": 1}
+    return {"status": "ok", "step": "1 and 2"}
 
 
 @app.post("/step1/parse-menu", response_model=MenuSourceOut)
@@ -95,30 +106,63 @@ def list_parsed_menus(db: Session = Depends(get_db)):
     return [transform_menu_source(item) for item in menu_sources]
 
 
-def transform_menu_source(menu_source: MenuSource):
-    return {
-        "id": menu_source.id,
-        "restaurant_name": menu_source.restaurant_name,
-        "source_type": menu_source.source_type,
-        "source_value": menu_source.source_value,
-        "raw_menu_text": menu_source.raw_menu_text,
-        "recipes": [
+@app.get("/step2/recipe-nutrition/{recipe_id}")
+def recipe_nutrition(recipe_id: int, db: Session = Depends(get_db)):
+    recipe = (
+        db.query(Recipe)
+        .options(
+            joinedload(Recipe.ingredients).joinedload(RecipeIngredient.ingredient)
+        )
+        .filter(Recipe.id == recipe_id)
+        .first()
+    )
+
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+
+    nutrition_totals = {
+        "calories": 0.0,
+        "protein": 0.0,
+        "fat": 0.0,
+        "carbs": 0.0,
+    }
+
+    ingredient_results = []
+
+    for item in recipe.ingredients:
+        ingredient_name = item.ingredient.name
+
+        nutrition = get_ingredient_nutrition(
+            ingredient_name=ingredient_name,
+            quantity=item.quantity,
+            unit=item.unit,
+        )
+
+        if nutrition and nutrition.get("scaled"):
+            nutrition_totals["calories"] += nutrition.get("calories", 0.0)
+            nutrition_totals["protein"] += nutrition.get("protein", 0.0)
+            nutrition_totals["fat"] += nutrition.get("fat", 0.0)
+            nutrition_totals["carbs"] += nutrition.get("carbs", 0.0)
+
+        ingredient_results.append(
             {
-                "id": recipe.id,
-                "dish_name": recipe.dish_name,
-                "description": recipe.description,
-                "estimated_serving_size": recipe.estimated_serving_size,
-                "ingredients": [
-                    {
-                        "ingredient_name": recipe_ingredient.ingredient.name,
-                        "quantity": recipe_ingredient.quantity,
-                        "unit": recipe_ingredient.unit,
-                        "preparation_notes": recipe_ingredient.preparation_notes,
-                        "confidence_note": recipe_ingredient.confidence_note,
-                    }
-                    for recipe_ingredient in recipe.ingredients
-                ],
+                "ingredient": ingredient_name,
+                "quantity": item.quantity,
+                "unit": item.unit,
+                "nutrition": nutrition,
             }
-            for recipe in menu_source.recipes
-        ],
+        )
+
+    nutrition_totals = {
+        "calories": round(nutrition_totals["calories"], 2),
+        "protein": round(nutrition_totals["protein"], 2),
+        "fat": round(nutrition_totals["fat"], 2),
+        "carbs": round(nutrition_totals["carbs"], 2),
+    }
+
+    return {
+        "recipe_id": recipe.id,
+        "recipe": recipe.dish_name,
+        "ingredients": ingredient_results,
+        "total_nutrition": nutrition_totals,
     }
